@@ -33,8 +33,8 @@ function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
         //height: '390',
         //width: '640',
-        height: '390',
-        width: '640',
+        height: height + '',
+        width: width + '',
         playerVars: { 'rel': 0, color: 'white', theme: 'light'},
         events: {
             'onReady': onPlayerReady,
@@ -168,6 +168,13 @@ var changeLoadTimer;
 var player;
 var nextVideo = null;
 var loadingState = 0;
+var width = 640;
+var height = 390;
+if (window.innerWidth < width){
+    width = window.innerWidth-30; // the -30 if for the padding in the container
+    height = width*390/640;
+}
+
 
 $(document).ready(function(){
 
