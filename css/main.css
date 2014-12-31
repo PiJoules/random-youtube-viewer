@@ -1,0 +1,26 @@
+
+
+iframe {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* For screens at least 768px wide (large screens/desltops) */
+@media screen and (min-width: 768px){
+
+}
+
+/* For screens at most 767px wide (small screens/phones) */
+@media screen and (max-width: 767px){
+
+}
+
+
+.padding-top-20px {
+    padding-top: 20px;
+}
+
+
+

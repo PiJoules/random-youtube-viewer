@@ -1,0 +1,18 @@
+application: solar-dialect-810
+version: 1
+runtime: php
+api_version: 1
+
+handlers:
+- url: /css
+  static_dir: css
+
+- url: /js
+  static_dir: js
+
+# Bootstrap glyphicons
+- url: /fonts
+  static_dir: fonts
+
+- url: /.*
+  script: index.html

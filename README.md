@@ -1,8 +1,6 @@
-random-youtube-viewer
-=====================
+# Random YouTube Video Player
+A simple webapp that plays youtube videos selected randomly from a query to YouTube. An example is hosted on Google App Engine at http://solar-dialect-810.appspot.com/.
 
-[Click in here to view in your browser](http://ethanhjennings.github.io/random-youtube-viewer/)
-
-A simple webapp that plays youtube videos selected randomly from a query to YouTube.
-
-It works with Chromecast so you can watch random videos on your TV! It doesn't currently work with mobile though.
+## Dependencies
+- [Bootstrap 3](http://getbootstrap.com/)
+- [jQuery](http://jquery.com/)
