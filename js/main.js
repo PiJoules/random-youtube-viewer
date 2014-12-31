@@ -29,35 +29,72 @@ function randRange(min,max) {
 
 // initialize player
 // video scale of 640/390 (w:h)
+// videoId: 'SmobkT8IuxM',
 function onYouTubeIframeAPIReady() {
-    player = new YT.Player('player', {
-        //height: '390',
-        //width: '640',
-        height: height + '',
-        width: width + '',
-        playerVars: { 'rel': 0, color: 'white', theme: 'light'},
-        events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange,
-            'onError': onPlayerError
-        }
-    });
-};
+    if (!onMobile){
+        player = new YT.Player('player', {
+            height: height + '',
+            width: width + '',
+            playerVars: { 'rel': 0, color: 'white', theme: 'light'},
+            events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange,
+                'onError': onPlayerError
+            }
+        });
+    }
+    // Add videoId to player constructor if on mobile
+    else {
+        // setup timer to change loading animation
+        clearInterval(changeLoadTimer);
+        changeLoadTimer = setInterval(changeLoadAnimation, 120);
 
-function onPlayerReady(event) {
-    loadVideo();
-};
+        var query = $("#video_keywords").val();
+        pickRandomVideo(query,function(video) {
+            // stop loading animation
+            clearInterval(changeLoadTimer);
+            $("#currently_playing").html(video.name + "<br>");
 
-function onPlayerStateChange(event) {
-    if (event.data === YT.PlayerState.ENDED) {
-        // video ended, time to load the next video
-        loadVideo();
+            player = new YT.Player('player', {
+                videoId: video.id + '',
+                height: height + '',
+                width: width + '',
+                playerVars: { 'rel': 0, color: 'white', theme: 'light'},
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange,
+                    'onError': onPlayerError
+                }
+            });
+
+        });
     }
 };
 
+function onPlayerReady(event) {
+    if (!onMobile)
+        loadVideo();
+    // Do not create a new video player if on mobile since
+    // this method is called after crating a new video player
+    // while on mobile, and would loop over and over
+};
+
+// Video ended, time to load the next video
+function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.ENDED) {
+        if (!onMobile)
+            loadVideo();
+        else
+            reloadYoutubeScript();
+    }
+};
+
+// Just give up and try to load a new video :-(
 function onPlayerError() {
-    // just give up and try to load a new video :-(
-    loadVideo();
+    if (!onMobile)
+        loadVideo();
+    else
+        reloadYoutubeScript();
 };
 
 // loads a video list for a query
@@ -139,12 +176,34 @@ function loadVideo() {
 
         // stop loading animation
         clearInterval(changeLoadTimer);
-
         $("#currently_playing").html(video.name + "<br>");
         
         // give YouTube player the new video
-        player.loadVideoById(video.id);
+        if (!onMobile)
+            player.loadVideoById(video.id);
+
+        // Give some time for a video to load one of the first few frames
+        // after loading
+        /*if (firstVideo){
+            //setTimeout(function(){
+                player.pauseVideo();
+            //}, 500);
+            firstVideo = false;
+        }*/
     });
+};
+
+
+// Rerun the edited script for implementing youtube's video player
+function reloadYoutubeScript(){
+    $("#player-container").html(""); // remove the iframe
+
+    // remove the external script
+    $("#youtube-api").remove();
+    $("#www-widgetapi-script").remove();
+
+    $("#player-container").html('<div id="player"></div>'); // re-add the player
+    $("body").append('<script src="/js/youtube-api.js" type="text/javascript"></script>'); // re-add the external script to trigger to reload the player
 };
 
 
@@ -160,8 +219,15 @@ function changeLoadAnimation() {
 
 // Youtube Player functions -->
 
+// Major functions call order (if not on mobile)
+// 1. onYouTubeIframeAPIReady()
+// 2. loadVideo()
+// 3. pickRandomVideo()
+// 4. getVideoList()
+// 5. extractVideoId()
 
 
+var firstVideo = true; // pause only on first video/ when page is first loaded
 var last_picked_videos = [];
 var last_picked_videos_max = 10;
 var changeLoadTimer;
@@ -175,16 +241,34 @@ if (window.innerWidth < width){
     height = width*390/640;
 }
 
+// For detecting if on mobile or not
+// The loadVideoById() method does not work on mobile (or safari mobile at least)
+var md = new MobileDetect(window.navigator.userAgent);
+var onMobile = md.mobile();
+onMobile = true;
 
 $(document).ready(function(){
 
     // these two buttons do the same thing :-p
-    $("#play_button").click(loadVideo);
-    $("#skip_button").click(loadVideo);
+    $("#play_button").click(function(){
+        if (!onMobile)
+            loadVideo();
+        else
+            reloadYoutubeScript();
+    });
+    $("#skip_button").click(function(){
+        if (!onMobile)
+            loadVideo();
+        else
+            reloadYoutubeScript();
+    });
 
     $("#video_keywords").keypress(function(e) {
         if(e.which == 10 || e.which == 13) {
-            loadVideo();
+            if (!onMobile)
+                loadVideo();
+            else
+                reloadYoutubeScript();
         }
     });
 });
