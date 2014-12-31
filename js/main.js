@@ -245,7 +245,7 @@ if (window.innerWidth < width){
 // The loadVideoById() method does not work on mobile (or safari mobile at least)
 var md = new MobileDetect(window.navigator.userAgent);
 var onMobile = md.mobile();
-onMobile = true;
+
 
 $(document).ready(function(){
 
